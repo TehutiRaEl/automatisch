@@ -1,15 +1,18 @@
 {
   "colony_id": "automatisch",
   "colony_name": "Automatisch",
-  "role": "automation",
-  "description": "Integration automation bus — connects all colonies via Zapier-compatible workflows",
+  "role": "colony",
+  "archetype": "workflow",
+  "layer": 7,
+  "entity": "CHILD (Workflow Expression)",
+  "guilds": ["workflow", "automation", "integration"],
   "hive": "sovereign-hive",
-  "queen": "https://github.com/tehutirael/sovereign-hive-meta",
-  "repo": "https://github.com/tehutirael/automatisch",
-  "guilds": ["automation", "integration", "webhooks"],
+  "queen": "https://github.com/TehutiRaEl/-sovereign-hive-meta",
+  "version": "1.0.0",
+  "port": 3000,
   "health_endpoint": "/colony/health",
+  "info_endpoint": "/colony/info",
   "manifest_endpoint": "/colony/manifest",
-  "agents": ["automation-agent", "webhook-agent", "integration-broker"],
-  "capabilities": ["workflow-automation", "cross-colony-events", "zapier-compatible", "400-integrations"],
-  "constitution_version": "1.0.0"
+  "events_endpoint": "/colony/events",
+  "agents_endpoint": "/colony/agents"
 }

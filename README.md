@@ -1,61 +1,128 @@
-# Automatisch - Open Source Zapier Alternative
+# Automatisch — Workflow Automation Colony
 
-![Automatisch - Screenshot](https://user-images.githubusercontent.com/2501931/191562539-e42f6c34-03c7-4dc4-bcf9-7f9473a9c64f.png)
+[![Colony](https://img.shields.io/badge/colony-colony-orange)](#)
+[![Archetype](https://img.shields.io/badge/archetype-workflow-darkorange)](#)
+[![Layer](https://img.shields.io/badge/layer-7%20CHILD-yellow)](#)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue)](LICENSE)
+[![Hive](https://img.shields.io/badge/hive-sovereign--hive-gold)](#)
 
-🧐 Automatisch is a business automation tool that lets you connect different services like Twitter, Slack, and more to automate your business processes.
+> Open-source Zapier alternative and hive automation bus — 1000+ app integrations, self-hosted, GDPR-compliant.
 
-💸 Automating your workflows doesn't have to be a difficult or expensive process. You also don't need any programming knowledge to use Automatisch.
+## Role in the Sovereign Hive
 
-## Advantages
+| Field | Value |
+|-------|-------|
+| colony_id | `automatisch` |
+| role | colony |
+| archetype | workflow |
+| layer | 7 (CHILD — Workflow Expression) |
+| entity | CHILD (Workflow Expression) |
+| guilds | workflow, automation, integration |
+| queen | THEHIVE :8080 |
+| port | 3001 |
 
-There are other existing solutions in the market, like Zapier and Integromat, so you might be wondering why you should use Automatisch.
+## What This Does
 
-✅ One of the main benefits of using Automatisch is that it allows you to store your data on your own servers, which is essential for businesses that handle sensitive user information and cannot risk sharing it with external cloud services. This is especially relevant for industries such as healthcare and finance, as well as for European companies that must adhere to the General Data Protection Regulation (GDPR).
+Automatisch is the workflow automation colony — the hive's integration bus. It connects 1000+ services (Slack, GitHub, Google Sheets, Stripe, webhooks, and more) via a no-code drag-and-drop builder. Within the Sovereign Hive it serves as:
 
-🤓 Your contributions are vital to the development of Automatisch. As an open-source software, anyone can have an impact on how it is being developed.
+- **Automation Bus**: Routes inter-colony workflow triggers between THEHIVE, aether, NAR2, and external services
+- **Webhook Hub**: Receives external webhooks and fans them as hive events
+- **LLM Chain Runner**: Executes LLM-backed automation flows using the Queen's `/v11/llm/chat` endpoint
+- **Scheduled Tasks**: Cron-driven colony health checks and constitution compliance scans
 
-💙 No vendor lock-in. If you ever decide that Automatisch is no longer helpful for your business, you can switch to any other provider, which will be easier than switching from the one cloud provider to another since you have all data and flexibility.
+Data stays on your server. No vendor lock-in. GDPR-compliant by design.
 
-## Documentation
-
-The official documentation can be found here: [https://automatisch.io/docs](https://automatisch.io/docs)
-
-## Installation
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/automatisch/automatisch.git
-
-# Go to the repository folder
+git clone https://github.com/TehutiRaEl/automatisch
 cd automatisch
-
-# Start
-docker compose up
+docker-compose up -d
 ```
 
-You can use `user@automatisch.io` email address and `sample` password to login to Automatisch. Please do not forget to change your email and password from the settings page.
+Open `http://localhost:3001` to access the workflow builder.
 
-For other installation types, you can check the [installation](https://automatisch.io/docs/guide/installation) guide.
+Or for development:
+```bash
+npm install
+npm run build
+npm run start:dev
+```
 
-## Community Links
+## Colony Standard Layer
 
-- [Discord](https://discord.gg/dJSah9CVrC)
-- [Twitter](https://twitter.com/automatischio)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/colony/health` | Live health + uptime |
+| GET | `/colony/info` | Colony identity, layer, entity, guilds |
+| GET | `/colony/manifest` | Endpoints + capabilities |
+| POST | `/colony/events` | Accept hive dispatch events |
+| GET | `/colony/agents` | Workflow engine agent |
 
-## Support
+## Core Endpoints
 
-If you have any questions or problems, please visit our GitHub issues page, and we'll try to help you as soon as possible.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/healthcheck` | Application health |
+| GET | `/api/flows` | List automation flows |
+| POST | `/api/flows` | Create new flow |
+| GET | `/api/connections` | List app connections |
+| POST | `/webhooks/{id}` | Webhook trigger entry |
 
-[https://github.com/automatisch/automatisch/issues](https://github.com/automatisch/automatisch/issues)
+## Architecture
 
-## License
+```
+automatisch (workflow / layer 7) :3001
+├── packages/
+│   ├── backend/                    # Express.js API + BullMQ
+│   │   └── src/
+│   │       ├── server.js           # App entry point
+│   │       ├── routes/
+│   │       │   ├── colony.js       # Colony standard layer (ES module)
+│   │       │   └── index.js        # Route aggregator
+│   │       ├── jobs/               # BullMQ job processors
+│   │       └── models/             # Objection.js models
+│   └── web/                        # React frontend
+│       └── src/
+│           └── components/
+│               └── FlowBuilder/    # Drag-and-drop flow editor
+├── colony.json                     # Colony identity manifest
+├── soul.md                         # F-001–F-006 constitution (synced from Queen)
+├── docker-compose.yml
+└── .github/workflows/
+    └── constitution-receive.yml    # Auto-sync soul.md from Queen
+```
 
-Automatisch Community Edition (Automatisch CE) is an open-source software with the [AGPL-3.0 license](LICENSE.agpl).
+## Services (Docker)
 
-Automatisch Enterprise Edition (Automatisch EE) is a commercial offering with the [Enterprise license](LICENSE.enterprise).
+| Service | Port | Description |
+|---------|------|-------------|
+| automatisch | 3001 | Main app (API + frontend) |
+| postgres | 5432 | Flow/connection storage |
+| redis | 6379 | BullMQ job queue |
 
-The Automatisch repository contains both AGPL-licensed and Enterprise-licensed files. We maintain a single repository to make development easier.
+## Environment Variables
 
-All files that contain ".ee." in their name fall under the [Enterprise license](LICENSE.enterprise). All other files fall under the [AGPL-3.0 license](LICENSE.agpl).
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `APP_SECRET_KEY` | *(required)* | Session signing secret |
+| `POSTGRES_HOST` | `postgres` | PostgreSQL hostname |
+| `POSTGRES_DATABASE` | `automatisch` | Database name |
+| `REDIS_HOST` | `redis` | Redis hostname |
+| `QUEEN_URL` | `http://localhost:8080` | THEHIVE Queen URL |
+| `ENCRYPTION_KEY` | *(required)* | Credentials encryption key |
 
-See the [LICENSE](LICENSE) file for more information.
+## Hive Integration
+
+Automatisch accepts hive events at `POST /colony/events` and can trigger flows from Queen dispatches. Use the webhook trigger to receive any `repository_dispatch` or `HiveMesh` event and route it to downstream apps.
+
+Example: Constitution-sync trigger → Slack notification → JIRA ticket.
+
+## Constitution Sync
+
+Receives `soul.md` updates from the Queen via `.github/workflows/constitution-receive.yml`.
+
+## Contributing
+
+This is a fork of [automatisch/automatisch](https://github.com/automatisch/automatisch) with Sovereign Hive colony integration. Upstream improvements are welcome. Hive-specific changes go in `packages/backend/src/routes/colony.js`.
