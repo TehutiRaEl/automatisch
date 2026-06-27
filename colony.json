@@ -1,15 +1,27 @@
 {
   "colony_id": "automatisch",
-  "colony_name": "Automatisch",
-  "role": "automation",
-  "description": "Integration automation bus — connects all colonies via Zapier-compatible workflows",
+  "colony_name": "automatisch",
+  "role": "colony",
+  "archetype": "workflow",
+  "layer": 7,
+  "entity": "CHILD (Workflow Expression)",
+  "description": "Open-source workflow automation — the integration backbone of the hive",
   "hive": "sovereign-hive",
-  "queen": "https://github.com/tehutirael/sovereign-hive-meta",
-  "repo": "https://github.com/tehutirael/automatisch",
-  "guilds": ["automation", "integration", "webhooks"],
+  "queen": "https://github.com/TehutiRaEl/-sovereign-hive-meta",
+  "repo": "https://github.com/TehutiRaEl/automatisch",
+  "guilds": ["workflow", "automation", "integration"],
   "health_endpoint": "/colony/health",
   "manifest_endpoint": "/colony/manifest",
-  "agents": ["automation-agent", "webhook-agent", "integration-broker"],
-  "capabilities": ["workflow-automation", "cross-colony-events", "zapier-compatible", "400-integrations"],
-  "constitution_version": "1.0.0"
+  "agents": ["workflow-engine", "integration-agent", "trigger-agent", "action-agent"],
+  "capabilities": ["zapier-alternative", "100-plus-integrations", "gdpr-compliant", "self-hosted", "no-code"],
+  "stack": "JavaScript/Node.js (full-stack)",
+  "mission": "CHILD Workflow Expression — executes inter-hive automation, connects colonies to external services",
+  "constitution_version": "2.0.0",
+  "soul_source": "https://raw.githubusercontent.com/TehutiRaEl/-sovereign-hive-meta/main/soul.md",
+  "hierarchy": {
+    "born": "second",
+    "parent": "DAEMON",
+    "siblings": ["aether", "LocalAGI", "Kimi-K2"],
+    "format": "circuit"
+  }
 }
