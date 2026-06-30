@@ -1,8 +1,21 @@
-import { Router } from 'express';
-import { randomUUID } from 'crypto';
-import { createHash } from 'crypto';
+import express, { Router } from 'express';
+import { randomUUID, createHash, createHmac, timingSafeEqual } from 'crypto';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+
+const _HIVE_SECRET = process.env.HIVE_JWT_SECRET || '';
+
+function verifyHiveSignature(req, rawBody) {
+  if (!_HIVE_SECRET) return true; // permissive dev mode
+  const sig = req.headers['x-hive-signature'] || '';
+  if (!sig.startsWith('sha256=')) return false;
+  const expected = 'sha256=' + createHmac('sha256', _HIVE_SECRET).update(rawBody).digest('hex');
+  try {
+    return timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+  } catch {
+    return false; // length mismatch
+  }
+}
 
 const router = Router();
 const start = Date.now();
@@ -48,7 +61,20 @@ router.get('/manifest', (req, res) => {
   });
 });
 
-router.post('/events', (req, res) => {
+router.post('/events', express.raw({ type: '*/*' }), (req, res) => {
+  const rawBody = req.body instanceof Buffer ? req.body : Buffer.from(JSON.stringify(req.body) || '{}');
+  if (!verifyHiveSignature(req, rawBody)) {
+    return res.status(401).json({ error: 'Invalid hive signature', colony_id: 'automatisch' });
+  }
+  let event;
+  try {
+    event = JSON.parse(rawBody.toString());
+    if (!event.event_type) {
+      return res.status(422).json({ error: 'Missing event_type', colony_id: 'automatisch' });
+    }
+  } catch {
+    return res.status(422).json({ error: 'Invalid event body', colony_id: 'automatisch' });
+  }
   res.json({ event_id: randomUUID(), status: 'received', colony_id: 'automatisch' });
 });
 
