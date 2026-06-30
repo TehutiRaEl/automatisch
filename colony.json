@@ -1,18 +1,27 @@
 {
   "colony_id": "automatisch",
-  "colony_name": "Automatisch",
+  "colony_name": "automatisch",
   "role": "colony",
   "archetype": "workflow",
   "layer": 7,
   "entity": "CHILD (Workflow Expression)",
-  "guilds": ["workflow", "automation", "integration"],
+  "description": "Open-source workflow automation — the integration backbone of the hive",
   "hive": "sovereign-hive",
   "queen": "https://github.com/TehutiRaEl/-sovereign-hive-meta",
-  "version": "1.0.0",
-  "port": 3000,
+  "repo": "https://github.com/TehutiRaEl/automatisch",
+  "guilds": ["workflow", "automation", "integration"],
   "health_endpoint": "/colony/health",
-  "info_endpoint": "/colony/info",
   "manifest_endpoint": "/colony/manifest",
-  "events_endpoint": "/colony/events",
-  "agents_endpoint": "/colony/agents"
+  "agents": ["workflow-engine", "integration-agent", "trigger-agent", "action-agent"],
+  "capabilities": ["zapier-alternative", "100-plus-integrations", "gdpr-compliant", "self-hosted", "no-code"],
+  "stack": "JavaScript/Node.js (full-stack)",
+  "mission": "CHILD Workflow Expression — executes inter-hive automation, connects colonies to external services",
+  "constitution_version": "2.0.0",
+  "soul_source": "https://raw.githubusercontent.com/TehutiRaEl/-sovereign-hive-meta/main/soul.md",
+  "hierarchy": {
+    "born": "second",
+    "parent": "DAEMON",
+    "siblings": ["aether", "LocalAGI", "Kimi-K2"],
+    "format": "circuit"
+  }
 }
