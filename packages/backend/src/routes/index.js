@@ -6,9 +6,11 @@ import apiRouter from '@/routes/api/index.js';
 import internalApiRouter from '@/routes/internal/api/index.js';
 import mcpRouter from '@/routes/api/v1/mcp.ee.js';
 import { checkIsEnterprise } from '@/helpers/check-is-enterprise.js';
+import colonyRouter from '@/routes/colony.js';
 
 const router = Router();
 
+router.use('/colony', colonyRouter);
 router.use('/webhooks', webhooksRouter);
 router.use('/paddle', paddleRouter);
 router.use('/healthcheck', healthcheckRouter);
