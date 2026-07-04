@@ -7,10 +7,37 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const PORT = process.env.COLONY_PORT || 3030;
 const START = Date.now();
 const events = [];
+
+// HMAC secret — same value as THEHIVE's jwt_secret_key.
+// Unset = permissive mode (local dev), matching routes/colony.js.
+const HIVE_SECRET = process.env.HIVE_JWT_SECRET || '';
+
+function verifyHiveSignature(sigHeader, body) {
+  if (!HIVE_SECRET) return true;
+  if (!sigHeader || !sigHeader.startsWith('sha256=')) return false;
+  const expected =
+    'sha256=' +
+    crypto.createHmac('sha256', HIVE_SECRET).update(body).digest('hex');
+  try {
+    return crypto.timingSafeEqual(Buffer.from(sigHeader), Buffer.from(expected));
+  } catch {
+    return false;
+  }
+}
+
+function soulHash() {
+  try {
+    const soul = fs.readFileSync(path.join(__dirname, '../../soul.md'));
+    return crypto.createHash('sha256').update(soul).digest('hex').slice(0, 16);
+  } catch {
+    return 'none';
+  }
+}
 
 const colonyJsonPath = path.join(__dirname, '../../colony.json');
 const identity = JSON.parse(fs.readFileSync(colonyJsonPath, 'utf8'));
@@ -48,16 +75,33 @@ const handlers = {
     let body = '';
     req.on('data', (d) => (body += d));
     req.on('end', () => {
+      if (!verifyHiveSignature(req.headers['x-hive-signature'], body)) {
+        return json(res, { error: 'invalid hive signature' }, 401);
+      }
       try {
         const evt = { ts: new Date().toISOString(), ...JSON.parse(body) };
         events.push(evt);
         if (events.length > 100) events.shift();
-        json(res, { status: 'accepted', event_id: `evt-${Date.now()}` });
+        json(res, {
+          status: 'accepted',
+          event_id: `evt-${Date.now()}`,
+          colony_id: identity.colony_id,
+        });
       } catch {
         json(res, { error: 'invalid JSON' }, 400);
       }
     });
   },
+
+  'GET /colony/capabilities': (_req, res) =>
+    json(res, {
+      ...identity,
+      status: 'healthy',
+      uptime_s: Math.round((Date.now() - START) / 100) / 10,
+      soul_md_hash: soulHash(),
+      health_endpoint: '/colony/health',
+      capabilities_endpoint: '/colony/capabilities',
+    }),
 
   'GET /colony/manifest': (_req, res) => {
     let soul = '';
@@ -76,6 +120,7 @@ const handlers = {
         agents: '/colony/agents',
         events: '/colony/events',
         manifest: '/colony/manifest',
+        capabilities: '/colony/capabilities',
       },
     });
   },
