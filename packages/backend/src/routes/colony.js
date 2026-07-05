@@ -53,11 +53,33 @@ router.get('/manifest', (req, res) => {
   res.json({
     colony_id: 'automatisch',
     endpoints: ['/colony/health', '/colony/info', '/colony/manifest', '/colony/events',
-                '/colony/agents', '/healthcheck', '/api/v1/flows', '/api/v1/connections',
-                '/api/v1/triggers', '/webhooks'],
+                '/colony/agents', '/colony/capabilities', '/healthcheck', '/api/v1/flows',
+                '/api/v1/connections', '/api/v1/triggers', '/webhooks'],
     capabilities: ['workflow_automation', 'webhook_triggers', 'app_integrations',
                    'llm_chains', 'job_queue', 'mcp_support'],
     version: '1.0.0',
+  });
+});
+
+router.get('/capabilities', (req, res) => {
+  let identity = {};
+  try {
+    const p = join(process.cwd(), 'colony.json');
+    if (existsSync(p)) identity = JSON.parse(readFileSync(p, 'utf8'));
+  } catch {
+    // fall through to inline identity
+  }
+  res.json({
+    colony_id: 'automatisch',
+    colony_name: 'Automatisch',
+    role: 'colony',
+    version: '1.0.0',
+    ...identity,
+    status: 'healthy',
+    uptime_s: Math.round((Date.now() - start) / 100) / 10,
+    soul_md_hash: soulHash(),
+    health_endpoint: '/colony/health',
+    capabilities_endpoint: '/colony/capabilities',
   });
 });
 
