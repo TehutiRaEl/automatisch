@@ -2,6 +2,24 @@ import express, { Router } from 'express';
 import { randomUUID, createHash, createHmac, timingSafeEqual } from 'crypto';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { execSync } from 'child_process';
+
+// AGPL-3.0 Section 13 (Remote Network Interaction) compliance: this fork's
+// modified source must stay discoverable to anyone interacting with the
+// running instance over a network. Real commit hash when available (a
+// deployed image usually still has .git, or the platform sets a commit env
+// var); falls back to 'unknown' rather than silently omitting the field.
+const SOURCE_REPO_URL = 'https://github.com/TehutiRaEl/automatisch';
+
+function currentSourceCommit() {
+  try {
+    return execSync('git rev-parse HEAD', { cwd: process.cwd() })
+      .toString()
+      .trim();
+  } catch {
+    return process.env.SOURCE_COMMIT || process.env.GIT_SHA || 'unknown';
+  }
+}
 
 const _HIVE_SECRET = process.env.HIVE_JWT_SECRET || '';
 
@@ -58,6 +76,13 @@ router.get('/manifest', (req, res) => {
     capabilities: ['workflow_automation', 'webhook_triggers', 'app_integrations',
                    'llm_chains', 'job_queue', 'mcp_support'],
     version: '1.0.0',
+    // AGPL-3.0 Section 13: the corresponding source of the exact running
+    // modified version, not just a generic "here's the project" link.
+    source: {
+      repo: SOURCE_REPO_URL,
+      commit: currentSourceCommit(),
+      license: 'AGPL-3.0',
+    },
   });
 });
 
